@@ -20,7 +20,7 @@ public :
 template <typename T>
 class linklist
 {
-    private:
+    public:
 	node<T> * h ;
 	int size ;
     public:
@@ -60,13 +60,6 @@ class linklist
 		    tmp = tmp -> n;
 	    }
     }
-
-    T find( T x)
-    {
-        node<T> * tmp = this->h ;  
-    }
-
-
 };
 
 class bankaccount
@@ -115,6 +108,7 @@ class user
 
 
 };
+user choosenUser;
 
 set<int> generatedNumbers;
 
@@ -153,16 +147,75 @@ void sign_up()
     cin >> newuser.password;
     users.push_front(newuser);
     cout << "signed up successfully" << endl;
+    choosenUser=newuser;
 }
-void log_in ()
+bool log_in ()
 {
-    string tmpusername;
+    string tmpusername , tmppassword;
+    cout << "Enter your username :" << endl;
     cin >> tmpusername;
-    
+    cout << "Enter your password :" << endl;
+    cin >> tmppassword;
+    node<user> * t = users.h ;
+    while(t!=nullptr)
+    {
+        if(t->d.username==tmpusername)
+        {
+            if(t->d.password==tmppassword)
+            {
+                choosenUser=t->d;
+                cout << "logged in successfully ";
+                return true ;
+            }
+        }
+        t=t->n;
+    }
+    cout << "Username or password is wrong" <<endl;
+    cout << "Returning to menu" << endl ;
+    return false ; 
+}
+
+void menu()
+{
 
 }
+
 
 int main()
 {
-    cout<<"jsdus";
+
+    for(;;)
+    {
+        cout<<"Welcome!" << endl;
+        cout << "Please login or sign up " << endl << "1. login" << endl << "2. sign up" << endl << "3. Exit" << endl ;
+        int choose=0;
+        while(choose!=1 && choose!=2 && choose!=3)
+        {
+            cin >> choose;
+        }
+        if(choose==3)
+        {
+            return 0;
+        }
+        if(choose == 1)
+        {
+            bool tmp=log_in();
+            if(tmp==false)
+            {
+                continue;
+            }
+            else
+            {
+                break;
+            }
+        }
+        if(choose == 2)
+        {
+            sign_up();
+            break;
+        }
+    }
+
+
+
 }
