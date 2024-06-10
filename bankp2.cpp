@@ -38,19 +38,19 @@ class linklist
         h=nullptr;
         size=0;
     }
-    // ~linklist()
-    // {
-    //     node<T> * tmp = this->h ;
+    ~linklist()
+    {
+        node<T> * tmp = this->h ;
 
-    //     while ( tmp != 0 )
-    //     {
-    //         node<T>* tmp2 = tmp->n ;
-    //         delete tmp ;
-    //         tmp = tmp2;
-    //     }
-    //     this->h = nullptr ;
-    //     this->size = 0 ;
-    // }
+        while ( tmp != 0 )
+        {
+            node<T>* tmp2 = tmp->n ;
+            delete tmp ;
+            tmp = tmp2;
+        }
+        this->h = nullptr ;
+        this->size = 0 ;
+    }
     void push_front(T num)
     {
         node<T> * tmp = new node<T> ;
