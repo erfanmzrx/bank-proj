@@ -9,6 +9,7 @@
 #include <cstdlib>
 
 using namespace std;
+void choosebankacc();
 
 
 long long int RandomMaker( long long int min,long long int max) 
@@ -37,19 +38,19 @@ class linklist
         h=nullptr;
         size=0;
     }
-    ~linklist()
-    {
-        node<T> * tmp = this->h ;
+    // ~linklist()
+    // {
+    //     node<T> * tmp = this->h ;
 
-        while ( tmp != 0 )
-        {
-            node<T>* tmp2 = tmp->n ;
-            delete tmp ;
-            tmp = tmp2;
-        }
-        this->h = nullptr ;
-        this->size = 0 ;
-    }
+    //     while ( tmp != 0 )
+    //     {
+    //         node<T>* tmp2 = tmp->n ;
+    //         delete tmp ;
+    //         tmp = tmp2;
+    //     }
+    //     this->h = nullptr ;
+    //     this->size = 0 ;
+    // }
     void push_front(T num)
     {
         node<T> * tmp = new node<T> ;
@@ -87,12 +88,11 @@ class bankaccount
     string seconddynamicpass;
     void cvv2Maker()
     {
-        cvv2="100"+counterforcvv2;
-        counterforcvv2++;
+        cvv2=to_string(RandomMaker(100,9999));
     }
     void shabaMaker()
     {
-        shabanumber = "IR1000000000000000000000" + counterforshaba;
+        shabanumber = "IR1000000000000000000000" + to_string(counterforshaba);
         counterforshaba++;
     }
     void cdnumMaker()
@@ -106,7 +106,7 @@ class bankaccount
     }
     void passMaker()
     {
-        seconddynamicpass= RandomMaker(100000 , 999999);
+        seconddynamicpass= to_string(RandomMaker(100000 , 999999));
     }
     static string generateExpiryDate() 
     {
@@ -179,6 +179,7 @@ void sign_up()
     users.push_front(newuser);
     cout << "signed up successfully" << endl;
     choosenUser=newuser;
+    return;
 }
 bool log_in ()
 {
@@ -195,7 +196,8 @@ bool log_in ()
             if(t->d.password==tmppassword)
             {
                 choosenUser=t->d;
-                cout << "logged in successfully ";
+                choosenUser.accounts=t->d.accounts;
+                cout << "logged in successfully " << endl;
                 return true ;
             }
         }
@@ -242,12 +244,12 @@ void ctbankacc()
         cout << "Invalid password ! try again" << endl;
         cin >> newbankacc.fourdigitpass; 
     }    
-    // newbankacc.cdnumMaker();
+    newbankacc.cdnumMaker();
     newbankacc.accnumMaker();
     newbankacc.shabaMaker();
     newbankacc.cvv2Maker();
     newbankacc.expirationdate=newbankacc.generateExpiryDate();
-    cout << "Would you like to set secondry static password ?" << endl << endl << "1. Yes" << endl << "2. no";
+    cout << "Would you like to set secondry static password ?" << endl << endl << "1. Yes" << endl << "2. no" << endl;
     int tmp=0;
     while (tmp<1 || tmp>2)
     {
@@ -275,6 +277,19 @@ void ctbankacc()
     cout << "shaba number : " << newbankacc.shabanumber << endl;
     cout << "cvv2 : " << newbankacc.cvv2 << endl;
     cout << "expiration date : " << newbankacc.expirationdate << endl << endl;
+    node<user> * t = users.h;
+    while(t!=nullptr)
+    {
+        if(t->d.username==choosenUser.username)
+        {
+            if(t->d.password==choosenUser.password)
+            {
+                (*t).d.accounts.push_front(newbankacc);
+                break;
+            }
+        }
+        t=t->n;
+    }
     choosenUser.accounts.push_front(newbankacc);
     return;
 }   
@@ -355,7 +370,7 @@ void transfer()
         }
         t=t->n;
     }
-    if(x=false)
+    if(x==false)
     {
         cout << "invalid card number for reciver !" << endl ;
         return;
@@ -380,8 +395,70 @@ void transfer()
                 cout << "wrong password! returning back to panel" << endl;
                 return;
             }
+                node<user> * z = users.h ;
+                bool y=false;
+                while(z!=nullptr)
+                {
+                    node<bankaccount> *zmp=(*z).d.accounts.h;
+                    while(zmp!=nullptr)
+                    {
+                        if((*zmp).d.cardnumber == choosenBankacc.cardnumber )
+                        {
+                            (*zmp).d.balance-=amount;
+                            y=true;
+                            break;
+                        }
+                        zmp=zmp->n;
+                    }
+                    if(y==true)
+                    {
+                        break;
+                    }
+                    z=z->n;
+                }
+                node<bankaccount> * zd = choosenUser.accounts.h ;
+                while(zd!=nullptr)
+                {
+                    if(zd->d.cardnumber == choosencardnumber)
+                    {
+                        zd->d.balance-=amount;
+                        break;
+                    }
+                    zd=zd->n;
+                }
             choosenBankacc.balance-=amount;
-            reciver.balance+=99.99 * amount;
+            node<user> * g = users.h ;
+            bool d=false;
+            while(g!=nullptr)
+            {
+                node<bankaccount> *gmp=(*g).d.accounts.h;
+                while(gmp!=nullptr)
+                {
+                    if((*gmp).d.cardnumber == reccardnum )
+                    {
+                        (*gmp).d.balance+=0.9999*amount;
+                        d=true;
+                        break;
+                    }
+                    gmp=gmp->n;
+                }
+                if(d==true)
+                {
+                    break;
+                }
+                g=g->n;
+            }
+            node<bankaccount> * gd = choosenUser.accounts.h ;
+            while(gd!=nullptr)
+            {
+                if(gd->d.cardnumber== reccardnum)
+                {
+                    gd->d.balance+=0.9999*amount;
+                    break;
+                }
+                gd=gd->n;
+            }
+            reciver.balance+=0.9999 * amount;
             cout << "The transaction has been successfully completed." << endl;
             return;
         }
@@ -396,8 +473,70 @@ void transfer()
         cout << "wrong password! try again." << endl;
         cin >> pass; 
     }
+    node<user> * z = users.h ;
+    bool y=false;
+    while(z!=nullptr)
+    {
+        node<bankaccount> *zmp=(*z).d.accounts.h;
+        while(zmp!=nullptr)
+        {
+            if((*zmp).d.cardnumber == choosenBankacc.cardnumber )
+            {
+                (*zmp).d.balance-=amount;
+                y=true;
+                break;
+            }
+            zmp=zmp->n;
+        }
+        if(y==true)
+        {
+            break;
+        }
+        z=z->n;
+    }
+    node<bankaccount> * zd = choosenUser.accounts.h ;
+    while(zd!=nullptr)
+    {
+        if(zd->d.cardnumber == choosencardnumber)
+        {
+            zd->d.balance-=amount;
+            break;
+        }
+        zd=zd->n;
+    }
     choosenBankacc.balance-=amount;
-    reciver.balance+=99.99 * amount;
+    node<user> * g = users.h ;
+    bool d=false;
+    while(g!=nullptr)
+    {
+        node<bankaccount> *gmp=(*g).d.accounts.h;
+        while(gmp!=nullptr)
+        {
+            if((*gmp).d.cardnumber == reccardnum )
+            {
+                (*gmp).d.balance+=0.9999*amount;
+                d=true;
+                break;
+            }
+            gmp=gmp->n;
+        }
+        if(d==true)
+        {
+            break;
+        }
+        g=g->n;
+    }
+    node<bankaccount> * gd = choosenUser.accounts.h ;
+    while(gd!=nullptr)
+    {
+        if(gd->d.cardnumber== reccardnum)
+        {
+            gd->d.balance+=0.9999*amount;
+            break;
+        }
+        gd=gd->n;
+    }
+    reciver.balance+=0.9999 * amount;
     cout << "The transaction has been successfully completed." << endl;
     return;   
 }
@@ -406,6 +545,10 @@ void menu()
     int choice=0;
     while(choice!=5)
     {
+        if(choosenUser.accounts.size>0)
+        {
+            choosebankacc();
+        }
         choice=0;
         cout << "choose one of the options below :" << endl << endl;
         cout << "1. Create bank account" << endl;
@@ -491,6 +634,10 @@ int main()
             }
             else
             {
+                if(choosenUser.accounts.size>0)
+                {
+                    choosebankacc();
+                }
                 menu();
             }
         }
